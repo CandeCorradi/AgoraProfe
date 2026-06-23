@@ -8,11 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using Backend.DataContext;
 using Service.Models;
 using Backend.ExtensionMethods;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CapacitacionesController : ControllerBase
     {
         private readonly AgoraContext _context;
