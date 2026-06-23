@@ -1,13 +1,36 @@
+using Backend.Class;
 using Backend.DataContext;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
+DotNetEnv.Env.Load();
+
+var firebaseJson = Environment.GetEnvironmentVariable("GOOGLE_CREDENTIALS");
+
+if (string.IsNullOrWhiteSpace(firebaseJson))
+{
+    throw new Exception("Falta la variable GOOGLE_CREDENTIALS");
+}
+
+var credential = GoogleCredential.FromJson(firebaseJson);
+FirebaseApp.Create(new AppOptions
+{
+    Credential = credential
+});
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services
+    .AddAuthentication("Firebase")
+    .AddScheme<AuthenticationSchemeOptions, FirebaseAuthenticationHandler>("Firebase", null);
 
 var configuration = new ConfigurationBuilder()
                     .AddJsonFile("appsettings.json")
                     .Build();
-string? cadenaConexion = configuration.GetConnectionString("mysqlRemote");
+string? cadenaConexion = configuration.GetConnectionString("mysqlLocal");
 
 //configuración de inyección de dependencias del DBContext
 builder.Services.AddDbContext<AgoraContext>(
